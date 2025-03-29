@@ -37,7 +37,9 @@ ALLOWED_HOSTS = ['*']
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-q7o_@5+*=ppn5!t$dyvif^3a&1zr9pmk-&at9+z=1fi-&q-^b1'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-default-key')
+  
+
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
