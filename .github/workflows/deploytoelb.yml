@@ -45,7 +45,7 @@ jobs:
           if [ ! -d ".elasticbeanstalk" ]; then
             eb init -r ${{ secrets.AWS_REGION }} -p python-3.9 bookstore-app
           fi
-          eb use bookstore-env
+          eb use django-new-bookstore-env
 
       # Step 7: Deploy it to the Elastic Beanstalk
       - name: Deploy to Elastic Beanstalk
