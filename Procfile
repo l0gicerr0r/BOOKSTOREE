@@ -1,2 +1,3 @@
-web: gunicorn jobportal.wsgi:application --log-file -
+web: gunicorn bookstore.wsgi:application
+
 
