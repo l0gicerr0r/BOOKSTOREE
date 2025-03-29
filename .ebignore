@@ -1,0 +1,21 @@
+# Ignore virtual environment
+.env
+venv/
+.env/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore IDE and editor files
+.vscode/
+.idea/
+*.swp
+
+# Ignore deployment files
+.elasticbeanstalk/*
+!.elasticbeanstalk/config.yml  # Keep EB configuration
