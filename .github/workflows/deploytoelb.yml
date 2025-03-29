@@ -50,4 +50,4 @@ jobs:
       # Step 7: Deploy it to the Elastic Beanstalk
       - name: Deploy to Elastic Beanstalk
         run: |
-          eb deploy bookstore-env
+          eb deploy django-new-bookstore-env
