@@ -13,6 +13,7 @@ from boto3.dynamodb.conditions import Key
 from django.conf import settings
 from django.contrib import messages 
 from bookreturncalculatorPkg.bookreturncalculator import BookReturnCalculator
+from django.http import JsonResponse
 
 
 
@@ -122,25 +123,12 @@ def user_home(request):
         response = books_table.scan()
         books = response.get('Items', [])
 
-        # Fetch user's borrowed books from Users table in DynamoDB
-        user_response = users_table.get_item(Key={'username': request.user.username})
-        user_data = user_response.get('Item', {})
-
-        borrowed_books = user_data.get('borrowed_books', [])  # Default to empty list if no borrowed books
-
-        # Calculate remaining days for borrowed books
-        for book in borrowed_books:
-            borrow_date = datetime.strptime(book['borrow_date'], '%Y-%m-%d')
-            due_date = borrow_date + timedelta(days=30)
-            book['days_left'] = (due_date - datetime.today()).days
-
     except Exception as e:
-        books, borrowed_books = [], []
+        books = [] 
         print("Error fetching books:", str(e))
 
     return render(request, 'accounts/user_home.html', {
         'books': books,
-        'borrowed_books': borrowed_books
     })
 
 
@@ -242,28 +230,80 @@ def borrow_book(request, book_id):
 
 
 
+
+    
+# def display_borrowed_books(request):
+#     """
+#     This view fetches the borrowed books from the user's record in DynamoDB,
+#     extracts only the names of the borrowed books, and renders them in the
+#     borrowed_book.html template.
+#     """
+#     try:
+#         # Retrieve user data using the logged-in user's username
+#         print(request.user.username)
+#         user_response = users_table.get_item(Key={'username': request.user.username})
+#         user_data = user_response.get('Item', {})
+        
+#         # Get the borrowed_books list from the user data (default to an empty list)
+#         borrowed_books = user_data.get('borrowed_books', [])
+        
+#         # Extract only the 'name' from each borrowed book record
+#         borrowed_book_names = [book.get('name', 'Unknown Book') for book in borrowed_books]
+        
+#     except Exception as e:
+#         borrowed_book_names = []
+#         print("Error fetching borrowed books:", str(e))
+
+#     # Render the template, passing the list of borrowed book names
+#     return render(request, 'borrowed_book.html', {'borrowed_books': borrowed_book_names})
 @login_required
-def display_borrowed_books(request):
-    """
-    This view fetches the borrowed books from the user's record in DynamoDB,
-    extracts only the names of the borrowed books, and renders them in the
-    borrowed_book.html template.
-    """
+# def get_borrowed_books(request, username):  # Accept username as parameter
+#     try:
+#         borrowed_response = borrow_table.query(
+#             KeyConditionExpression=Key('username').eq(username)  # Use username from URL
+#         )
+#         borrowed_books = borrowed_response.get('Items', [])
+
+#         return JsonResponse({'borrowed_books': borrowed_books}, status=200)
+
+#     except Exception as e:
+#         print("Error fetching borrowed books:", str(e))
+#         return JsonResponse({'error': 'Internal Server Error'}, status=500)
+        
+def get_borrowed_books(request, username):
     try:
-        # Retrieve user data using the logged-in user's username
-        user_response = users_table.get_item(Key={'username': request.user.username})
-        user_data = user_response.get('Item', {})
+        # Query borrowed books for the user
+        borrowed_response = borrow_table.query(
+            KeyConditionExpression=Key('username').eq(username)
+        )
+        borrowed_books = borrowed_response.get('Items', [])
 
-        # Get the borrowed_books list from the user data (default to an empty list)
-        borrowed_books = user_data.get('borrowed_books', [])
+        # Process each borrowed book
+        for book in borrowed_books:
+            borrow_date_str = book['borrow_date']  # Example: '2025-03-31 10:48:35'
 
-        # Extract only the 'name' from each borrowed book record
-        borrowed_book_names = [book.get('name', 'Unknown Book') for book in borrowed_books]
+            # Handle date format (check if it includes time)
+            try:
+                borrow_date = datetime.strptime(borrow_date_str, '%Y-%m-%d %H:%M:%S')  # With time
+            except ValueError:
+                borrow_date = datetime.strptime(borrow_date_str, '%Y-%m-%d')  # Fallback to date only
+
+            due_date = borrow_date + timedelta(days=30)
+            days_left = (due_date - datetime.today()).days
+
+            # Fetch book details from books_table using book_id
+            book_id = book['book_id']
+            book_response = books_table.get_item(Key={'book_id': book_id})
+            book_data = book_response.get('Item', {})
+
+            # Merge book details
+            book['title'] = book_data.get('title', 'Unknown Title')
+            book['due_date'] = due_date.strftime('%Y-%m-%d')
+            book['days_left'] = days_left
+            book['status'] = "Overdue" if days_left < 0 else "Borrowed"
+
+        return JsonResponse({'borrowed_books': borrowed_books}, status=200)
 
     except Exception as e:
-        borrowed_book_names = []
         print("Error fetching borrowed books:", str(e))
-
-    # Render the template, passing the list of borrowed book names
-    return render(request, 'borrowed_book.html', {'borrowed_books': borrowed_book_names})
-
+        return JsonResponse({'error': 'Internal Server Error'}, status=500)

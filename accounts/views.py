@@ -129,15 +129,18 @@ def user_home(request):
         borrowed_books = user_data.get('borrowed_books', [])  # Default to empty list if no borrowed books
 
         # Calculate remaining days for borrowed books
+        today = datetime.today()
         for book in borrowed_books:
             borrow_date = datetime.strptime(book['borrow_date'], '%Y-%m-%d')
             due_date = borrow_date + timedelta(days=30)
-            book['days_left'] = (due_date - datetime.today()).days
+            book['days_left'] = (due_date - today).days
+            book['due_date'] = due_date.strftime('%Y-%m-%d')  # Format due date
 
+   
     except Exception as e:
-        books, borrowed_books = [], []
         print("Error fetching books:", str(e))
-
+        books, borrowed_books = [], []
+    
     return render(request, 'accounts/user_home.html', {
         'books': books,
         'borrowed_books': borrowed_books
@@ -242,28 +245,6 @@ def borrow_book(request, book_id):
 
 
 
-@login_required
-def display_borrowed_books(request):
-    """
-    This view fetches the borrowed books from the user's record in DynamoDB,
-    extracts only the names of the borrowed books, and renders them in the
-    borrowed_book.html template.
-    """
-    try:
-        # Retrieve user data using the logged-in user's username
-        user_response = users_table.get_item(Key={'username': request.user.username})
-        user_data = user_response.get('Item', {})
 
-        # Get the borrowed_books list from the user data (default to an empty list)
-        borrowed_books = user_data.get('borrowed_books', [])
 
-        # Extract only the 'name' from each borrowed book record
-        borrowed_book_names = [book.get('name', 'Unknown Book') for book in borrowed_books]
-
-    except Exception as e:
-        borrowed_book_names = []
-        print("Error fetching borrowed books:", str(e))
-
-    # Render the template, passing the list of borrowed book names
-    return render(request, 'borrowed_book.html', {'borrowed_books': borrowed_book_names})
 

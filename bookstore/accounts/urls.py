@@ -30,7 +30,8 @@
 
 from django.contrib import admin
 from django.urls import path
-from accounts.views import register_view, login_view, logout_view, user_home, landing_page,borrow_book
+from accounts.views import register_view, login_view, logout_view, user_home, landing_page,borrow_book, get_borrowed_books
+
 from . import views
 
 urlpatterns = [
@@ -50,13 +51,8 @@ urlpatterns = [
     # path('borrow/<str:book_id>/', borrow_book, name='borrow_book'),
     path('borrow/<str:book_id>/', borrow_book, name='borrow_book'),
     
-
-
-    path('borrow/', views.display_borrowed_books, name='display_borrowed_books'),
-
-
-    
-
+    # path('borrow/', views.display_borrowed_books, name='display_borrowed_books'),
+    path('api/borrowed-books/<str:username>/', get_borrowed_books, name='borrowed-books'),
 
 
 ]
