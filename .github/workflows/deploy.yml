@@ -45,7 +45,7 @@ jobs:
           VERSION_LABEL="app-${{ github.sha }}"
           echo "Creating application version ${VERSION_LABEL}..."
           aws elasticbeanstalk create-application-version \
-            --application-name online-bookstore-app \
+            --application-name django-bookstore \
             --version-label ${VERSION_LABEL} \
             --source-bundle S3Bucket=${{ secrets.AWS_S3_BUCKET_NAME }},S3Key=app-${{ github.sha }}.zip \
             --region ${{ secrets.AWS_REGION }}  # Replace with your S3 bucket name and region
