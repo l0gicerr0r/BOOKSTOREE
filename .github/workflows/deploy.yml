@@ -42,7 +42,7 @@ jobs:
       # This sets up the EB CLI to use the correct AWS region and Elastic Beanstalk application
       - name: Initialize EB CLI
         run: |
-          eb init -r ${{ secrets.AWS_REGION }} -p python-3.9 online-bookstore-app  # Replace with your Elastic Beanstalk app name
+          eb init -r ${{ secrets.AWS_REGION }} -p python-3.9 django-bookstore  # Replace with your Elastic Beanstalk app name
           eb use django-bookstore-env  # Replace with your environment name in Elastic Beanstalk
       # Step 7: Deploy to Elastic Beanstalk
       - name: Deploy to Elastic Beanstalk
