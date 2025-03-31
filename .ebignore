@@ -19,3 +19,4 @@ logs/
 # Ignore deployment files
 .elasticbeanstalk/*
 !.elasticbeanstalk/config.yml  # Keep EB configuration
+

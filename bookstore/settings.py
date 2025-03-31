@@ -9,52 +9,68 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-import os
-from pathlib import Path
+
 
 
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = Path(__file__).resolve().parent.parent
 
-#deploy
+# #deploy
+
+
+# # BASE_DIR = Path(__file__).resolve().parent.parent
+
+# # Use environment variable for security (update before production)
+# # SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-default-key')
+
+
+
+# # Temporarily allowing all hosts; update with your EB domain later
+# #ALLOWED_HOSTS = ['*']
+
+# # Quick-start development settings - unsuitable for production
+# # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+
+# # SECURITY WARNING: keep the secret key used in production secret!
+# SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-default-key')
+  
+
+
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, 'static'),
+  
+# # Add this line to serve static files in development
+# ]
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+
+
+# # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = False
+
+# ALLOWED_HOSTS = ['*']
+
 
 import os
 from pathlib import Path
 
-# BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Use environment variable for security (update before production)
-# SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-default-key')
-
-
-
-# Temporarily allowing all hosts; update with your EB domain later
-ALLOWED_HOSTS = ['*']
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-default-key')
-  
 
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-  
-# Add this line to serve static files in development
-]
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
-
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost','8b0882a3b6674827ae56ac12a71c4ad1.vfs.cloud9.us-east-1.amazonaws.com','*']
+# Temporarily allowing all hosts; update with your EB domain later
+ALLOWED_HOSTS = ['*','django-bookstore-env.eba-j447ym2p.us-east-1.elasticbeanstalk.com','8b0882a3b6674827ae56ac12a71c4ad1.vfs.cloud9.us-east-1.amazonaws.com']
+
+# Static files settings
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 
 
 # Application definition
@@ -147,7 +163,7 @@ STATIC_URL = 'static/'
 
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+# https://docs.djangopfroject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
