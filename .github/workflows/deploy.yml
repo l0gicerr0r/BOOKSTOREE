@@ -1,0 +1,57 @@
+name: Deploy to Elastic Beanstalk
+
+on:
+  push:
+    branches:
+      - main  # Trigger the deployment only when code is pushed to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # The GitHub Action will run on an Ubuntu environment
+
+    steps:
+      # Step 1: Check out the repository code
+      - name: Check Out Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'  # Use Python 3.9 for your project
+
+      # Step 3: Install dependencies from requirements.txt
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Install all dependencies listed in requirements.txt
+
+      # Step 4: Configure AWS Credentials (using GitHub secrets for security)
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  # Stored in GitHub secrets
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # Stored in GitHub secrets
+          aws-region: ${{ secrets.AWS_REGION }}  # The AWS region you are using for Elastic Beanstalk (e.g., us-east-1)
+          aws_session_token: ${{ secrets.AWS_SESSION_TOKEN }}
+
+      # Step 5: Install the Elastic Beanstalk CLI (EB CLI)
+      - name: Install EB CLI
+        run: pip install awsebcli
+
+      # Step 6: Initialize EB
+      # This sets up the EB CLI to use the correct AWS region and Elastic Beanstalk application
+      - name: Initialize EB CLI
+        run: |
+          eb init -r ${{ secrets.AWS_REGION }} -p python-3.9 online-bookstore-app  # Replace with your Elastic Beanstalk app name
+          eb use online-bookstore-env  # Replace with your environment name in Elastic Beanstalk
+
+      # Step 7: Deploy to Elastic Beanstalk
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          eb deploy online-bookstore-env  # Replace with your Elastic Beanstalk environment name
+          
+      # Optional: Step 8: Notify via SNS (if you want to send a notification on successful deployment)
+      - name: Notify Deployment Success
+        run: |
+          aws sns publish --topic-arn arn:aws:sns:${{ secrets.AWS_REGION }}:your-account-id:your-sns-topic --message "Deployment to Elastic Beanstalk successful" --region ${{ secrets.AWS_REGION }}
