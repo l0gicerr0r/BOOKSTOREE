@@ -34,24 +34,35 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  # Stored in GitHub secrets
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ secrets.AWS_REGION }}  # The AWS region you are using for Elastic Beanstalk (e.g., us-east-1)
-         
+
       # Step 5: Install the Elastic Beanstalk CLI (EB CLI)
       - name: Install EB CLI
         run: pip install awsebcli
 
-      # Step 6: Initialize EB
+      # Step 6: Create a new application version in Elastic Beanstalk
+      - name: Create Application Version
+        run: |
+          VERSION_LABEL="app-${{ github.sha }}"
+          echo "Creating application version ${VERSION_LABEL}..."
+          aws elasticbeanstalk create-application-version \
+            --application-name online-bookstore-app \
+            --version-label ${VERSION_LABEL} \
+            --source-bundle S3Bucket=${{ secrets.AWS_S3_BUCKET_NAME }},S3Key=app-${{ github.sha }}.zip \
+            --region ${{ secrets.AWS_REGION }}  # Replace with your S3 bucket name and region
+
+      # Step 7: Initialize EB
       # This sets up the EB CLI to use the correct AWS region and Elastic Beanstalk application
       - name: Initialize EB CLI
         run: |
           eb init -r ${{ secrets.AWS_REGION }} -p python-3.9 online-bookstore-app  # Replace with your Elastic Beanstalk app name
           eb use django-bookstore-env  # Replace with your environment name in Elastic Beanstalk
 
-      # Step 7: Deploy to Elastic Beanstalk
+      # Step 8: Deploy to Elastic Beanstalk
       - name: Deploy to Elastic Beanstalk
         run: |
           eb deploy django-bookstore-env  # Replace with your Elastic Beanstalk environment name
-          
-      # Optional: Step 8: Notify via SNS (if you want to send a notification on successful deployment)
+
+      # Optional: Step 9: Notify via SNS (if you want to send a notification on successful deployment)
       - name: Notify Deployment Success
         run: |
           aws sns publish --topic-arn arn:aws:sns:${{ secrets.AWS_REGION }}:your-account-id:your-sns-topic --message "Deployment to Elastic Beanstalk successful" --region ${{ secrets.AWS_REGION }}
