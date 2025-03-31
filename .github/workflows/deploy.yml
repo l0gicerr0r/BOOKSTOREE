@@ -44,12 +44,12 @@ jobs:
       - name: Initialize EB CLI
         run: |
           eb init -r ${{ secrets.AWS_REGION }} -p python-3.9 online-bookstore-app  # Replace with your Elastic Beanstalk app name
-          eb use online-bookstore-env  # Replace with your environment name in Elastic Beanstalk
+          eb use django-bookstore-env  # Replace with your environment name in Elastic Beanstalk
 
       # Step 7: Deploy to Elastic Beanstalk
       - name: Deploy to Elastic Beanstalk
         run: |
-          eb deploy online-bookstore-env  # Replace with your Elastic Beanstalk environment name
+          eb deploy django-bookstore-env  # Replace with your Elastic Beanstalk environment name
           
       # Optional: Step 8: Notify via SNS (if you want to send a notification on successful deployment)
       - name: Notify Deployment Success
